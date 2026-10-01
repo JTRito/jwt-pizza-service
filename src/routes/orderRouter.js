@@ -69,7 +69,7 @@ orderRouter.get(
   authRouter.authenticateToken,
   asyncHandler(async (req, res) => {
     res.json(await DB.getOrders(req.user, req.query.page));
-  })
+   })
 );
 
 // createOrder
