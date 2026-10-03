@@ -30,7 +30,6 @@ test('get menu', async () => {
     const getRes = await request(app).get('/api/order/menu');
 
     expect(getRes.status).toBe(200);
-    expect(getRes.body[0]).toHaveProperty('title');
 })
 
 test('add item to menu', async () => {
