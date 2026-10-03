@@ -78,8 +78,7 @@ afterAll(async () => {
 async function login(user) {
     const loginRes = await request(app).put('/api/auth').send(user);
     let token = (loginRes.body.token);
-    let id = (loginRes.body.user.id);
-    return [token, id];
+    return token;
 }
 
 async function logout(token) {
