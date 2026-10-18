@@ -75,6 +75,39 @@ class DB {
     }
   }
 
+  async getUsers(page = 0, limit = config.db.listPerPage) {
+    const parsedPage = Number.parseInt(page, 10);
+    const parsedLimit = Number.parseInt(limit, 10);
+    const pageNumber = Number.isInteger(parsedPage) && parsedPage >= 0 ? parsedPage : 0;
+    const pageLimit = Number.isInteger(parsedLimit) && parsedLimit > 0 ? Math.min(parsedLimit, 100) : config.db.listPerPage;
+    const connection = await this.getConnection();
+    try {
+      const users = await this.query(
+        connection,
+        `SELECT * FROM user ORDER BY id LIMIT ? OFFSET ?`,
+        [pageLimit + 1, pageNumber * pageLimit],
+      );
+      const more = users.length > pageLimit;
+      if (more) {
+        users.pop();
+      }
+
+      for (const user of users) {
+        const roleRows = await this.query(connection, `SELECT * FROM userRole WHERE userId=?`, [user.id]);
+        const roles = roleRows.map((r) => ({
+          objectId: r.objectId || undefined,
+          role: r.role,
+        }));
+        user.roles = roles;
+        user.password = undefined;
+      }
+
+      return [users, more];
+    } finally {
+      connection.end();
+    }
+  }
+
   async updateUser(userId, name, email, password) {
     const connection = await this.getConnection();
     try {
@@ -94,6 +127,27 @@ class DB {
         await this.query(connection, query);
       }
       return this.getUser(email, password);
+    } finally {
+      connection.end();
+    }
+  }
+
+  async deleteUser(userId) {
+    const connection = await this.getConnection();
+    try {
+      await connection.beginTransaction();
+      try {
+        await this.query(connection, `DELETE FROM auth WHERE userId=?`, [userId]);
+        await this.query(connection, `DELETE FROM userRole WHERE userId=?`, [userId]);
+        const result = await this.query(connection, `DELETE FROM user WHERE id=?`, [userId]);
+        if (result.affectedRows === 0) {
+          throw new StatusCodeError('unknown user', 404);
+        }
+        await connection.commit();
+      } catch (error) {
+        await connection.rollback();
+        throw error;
+      }
     } finally {
       connection.end();
     }
