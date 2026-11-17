@@ -5,29 +5,29 @@
     "ServiceName": {
       "Type": "String",
       "Description": "Unique name for the JWT Pizza Service",
-      "Default": "jwt-pizza-service-next"
+      "Default": "jwt-pizza-service"
     },
     "CertificateArn": {
       "Type": "String",
       "Description": "Load balancer web certificate ARN use to support HTTPS on the ALB",
-      "Default": ""
+      "Default": "arn:aws:acm:us-east-1:815283997161:certificate/ced41162-9216-4da3-ad7b-54680ba86b60"
     },
     "VpcID": {
       "Type": "String",
       "Description": "The ID of the VPC for the ALB",
-      "Default": "",
+      "Default": "vpc-05ad817c1b58b3652",
       "AllowedPattern": "^(?:vpc-[0-9a-f]{8,17}|)$",
       "ConstraintDescription": "VPC ID must begin with 'vpc-' and have a valid uuid"
     },
     "SubnetIDs": {
       "Type": "CommaDelimitedList",
       "Description": "A comma delimited list of VPC network subnets for the ECS service and ALB",
-      "Default": ""
+      "Default": "subnet-06e286dc2333f9b57,subnet-02ac53d8f0ff1fb3c,subnet-03a5cafddf327a016,subnet-02a791b140a591f97,subnet-03d1798357dbbcc65,subnet-05ad060a7e7ab033a"
     },
     "SecurityGroupIDs": {
       "Type": "CommaDelimitedList",
       "Description": "ECS service and ALB Security groups",
-      "Default": ""
+      "Default": "sg-0ae9f91fa84e02a23"
     }
   },
   "Resources": {
